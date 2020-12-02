@@ -44,7 +44,7 @@ class TooltipContent extends Component {
     withErrorHandling,
 ])
 export class StaticBarChart extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         const t = props.t;
@@ -90,7 +90,7 @@ export class StaticBarChart extends Component {
     };
 
     static defaultProps = {
-        margin: { left: 40, right: 5, top: 5, bottom: 20 },
+        margin: {left: 40, right: 5, top: 5, bottom: 20},
         padding: 0.2,
         minValue: 0,
         colors: d3Scheme.schemeCategory10,
@@ -130,7 +130,7 @@ export class StaticBarChart extends Component {
         const width = this.containerNode.getClientRects()[0].width;
 
         if (this.state.width !== width)
-            this.setState({ width });
+            this.setState({width});
 
         const widthChanged = width !== this.renderedWidth;
         if (!forceRefresh && !widthChanged && !updateZoom) {
@@ -160,6 +160,15 @@ export class StaticBarChart extends Component {
             //.tickFormat(this.props.getLabel)
             .tickSizeOuter(0);
         this.xAxisSelection.call(xAxis);
+
+
+        // Ellipsis on too long labels
+        const texts = this.xAxisSelection.selectAll('.tick text');
+        texts.nodes().forEach(e => {
+            if (e.getBBox().width > xScale.bandwidth()) {
+                e.textContent = '...';
+            }
+        });
 
         // y axis
         const ySize = this.props.height - this.props.margin.top - this.props.margin.bottom;
@@ -250,7 +259,7 @@ export class StaticBarChart extends Component {
         const ySize = yScale.range()[0];
         const barWidth = xScale.bandwidth();
 
-        const selectBar = function(bar = null) {
+        const selectBar = function (bar = null) {
             if (bar !== self.state.selection) {
                 self.highlightSelection
                     .selectAll('rect')
@@ -289,7 +298,7 @@ export class StaticBarChart extends Component {
             .on("mouseover", selectBar)
             .on("mousemove", selectBar)
             .on("mouseout", ::this.deselectBars);
-        (this.props.withTransition ?  allBars.transition() : allBars)
+        (this.props.withTransition ? allBars.transition() : allBars)
             .attr('y', d => yScale(d.value))
             .attr("height", d => ySize - yScale(d.value));
 
@@ -316,15 +325,17 @@ export class StaticBarChart extends Component {
         return (
             <div ref={node => this.svgContainerSelection = select(node)}
                  className={this.props.className ? `${styles.touchActionNone} ${this.props.className}` : styles.touchActionNone}
-                 style={this.props.style} >
+                 style={this.props.style}>
                 <svg id="cnt" ref={node => this.containerNode = node} height={this.props.height} width={"100%"}>
                     <defs>
                         <clipPath id="plotRect">
-                            <rect x="0" y="0" width={this.state.width - this.props.margin.left - this.props.margin.right}
+                            <rect x="0" y="0"
+                                  width={this.state.width - this.props.margin.left - this.props.margin.right}
                                   height={this.props.height - this.props.margin.top - this.props.margin.bottom}/>
                         </clipPath>
                         <clipPath id="bottomAxis">
-                            <rect x={-6} y={0} width={this.state.width - this.props.margin.left - this.props.margin.right + 6}
+                            <rect x={-6} y={0}
+                                  width={this.state.width - this.props.margin.left - this.props.margin.right + 6}
                                   height={this.props.margin.bottom} /* same reason for 6 as in HeatmapChart */ />
                         </clipPath>
                     </defs>
