@@ -140,7 +140,8 @@ export class StaticBarChart extends Component {
 
         if (this.props.config.bars.length === 0) {
             this.statusMsgSelection.text(this.props.t('No data.'));
-
+            this.barsSelection.selectAll('rect').remove();
+            this.xAxisSelection.selectAll('.tick').remove();
             this.zoom = null;
             return;
         } else {
