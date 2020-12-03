@@ -14,7 +14,7 @@ import {withComponentMixins} from "../lib/decorator-helpers";
 import {withTranslation} from "../lib/i18n";
 import {PropType_d3Color, PropType_d3Color_Required, PropType_NumberInRange} from "../lib/CustomPropTypes";
 import {Tooltip} from "./Tooltip";
-import {AreZoomTransformsEqual, extentWithMargin, transitionInterpolate, WheelDelta} from "./common";
+import {areZoomTransformsEqual, extentWithMargin, transitionInterpolate, wheelDelta} from "./common";
 import styles from "./CorrelationCharts.scss";
 
 class TooltipContent extends Component {
@@ -113,7 +113,7 @@ export class StaticBarChart extends Component {
         const forceRefresh = this.prevContainerNode !== this.containerNode
             || !Object.is(prevProps.config, this.props.config);
 
-        const updateZoom = !AreZoomTransformsEqual(prevState.zoomTransform, this.state.zoomTransform);
+        const updateZoom = !areZoomTransformsEqual(prevState.zoomTransform, this.state.zoomTransform);
 
         this.createChart(forceRefresh, updateZoom);
         this.prevContainerNode = this.containerNode;
@@ -237,7 +237,7 @@ export class StaticBarChart extends Component {
             .on("zoom", handleZoom)
             .on("end", handleZoomEnd)
             .on("start", handleZoomStart)
-            .wheelDelta(WheelDelta(2))
+            .wheelDelta(wheelDelta(2))
             .filter(() => {
                 if (d3Event.type === "wheel" && !d3Event.shiftKey)
                     return false;
