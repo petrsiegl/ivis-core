@@ -74,6 +74,8 @@ export class StaticBarChart extends Component {
         margin: PropTypes.object,
         padding: PropType_NumberInRange(0, 1),
         colors: PropTypes.arrayOf(PropType_d3Color_Required()),
+        /** is called when label is longer than bar width; return label to be used */
+        labelFormatOnBarWidthOverflow: PropTypes.func,
 
         minValue: PropTypes.number,
         maxValue: PropTypes.number,
@@ -94,6 +96,7 @@ export class StaticBarChart extends Component {
         padding: 0.2,
         minValue: 0,
         colors: d3Scheme.schemeCategory10,
+        labelFormatOnBarWidthOverflow: (t) => '...',
 
         withTooltip: true,
         withTransition: true,
@@ -166,7 +169,7 @@ export class StaticBarChart extends Component {
         const texts = this.xAxisSelection.selectAll('.tick text');
         texts.nodes().forEach(e => {
             if (e.getBBox().width > xScale.bandwidth()) {
-                e.textContent = '...';
+                e.textContent = this.props.labelFormatOnBarWidthOverflow(e.textContent);
             }
         });
 
@@ -258,6 +261,7 @@ export class StaticBarChart extends Component {
             .data(data, d => d.label);
         const ySize = yScale.range()[0];
         const barWidth = xScale.bandwidth();
+        console.log(xScale.range())
 
         const selectBar = function (bar = null) {
             if (bar !== self.state.selection) {
