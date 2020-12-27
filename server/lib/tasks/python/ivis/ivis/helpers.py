@@ -34,8 +34,7 @@ class Ivis:
     def _send_request_message(msg):
         os.write(3, (json.dumps(msg) + '\n').encode())
 
-    @staticmethod
-    def create_signals(signal_sets=None, signals=None):
+    def create_signals(self, signal_sets=None, signals=None):
         msg = {
             'type': 'create_signals',
         }
@@ -47,10 +46,17 @@ class Ivis:
             msg['signals'] = signals
 
         Ivis._send_request_message(msg)
-        return Ivis._get_response_message()
+        response = Ivis._get_response_message()
 
-    @staticmethod
-    def create_signal_set(cid, namespace, name=None, description=None, record_id_template=None, signals=None):
+        # Add newly created to owned
+        for sigSetCid, value in response.items():
+            self.owned.setdefault('signalSets', {}).setdefault(sigSetCid, {})
+            for sigCid in value['fields']:
+                self.owned['signalSets'][sigSetCid].setdefault(sigCid, {})
+
+        return response
+
+    def create_signal_set(self, cid, namespace, name=None, description=None, record_id_template=None, signals=None):
 
         signal_set = {
             "cid": cid,
@@ -66,10 +72,9 @@ class Ivis:
         if signals is not None:
             signal_set['signals'] = signals
 
-        return Ivis.create_signals(signal_sets=signal_set)
+        return self.create_signals(signal_sets=signal_set)
 
-    @staticmethod
-    def create_signal(signal_set_cid, cid, namespace, type, name=None, description=None, indexed=None, settings=None,
+    def create_signal(self, signal_set_cid, cid, namespace, type, name=None, description=None, indexed=None, settings=None,
                       weight_list=None, weight_edit=None, **extra_keys):
 
         # built-in type is shadowed here because this way we are able to call create_signal(set_cid, **signal),
@@ -99,7 +104,7 @@ class Ivis:
         signals = {}
         signals[signal_set_cid]: signal
 
-        return Ivis.create_signals(signals=signals)
+        return self.create_signals(signals=signals)
 
     @staticmethod
     def store_state(state):
