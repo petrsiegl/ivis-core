@@ -1020,7 +1020,7 @@ async function storeRunState(id, state) {
     }
 }
 
-function createRunHandler(jobId, runId) {
+function createRunManager(jobId, runId) {
     const runData = {};
     runData.started_at = new Date();
 
@@ -1158,13 +1158,13 @@ async function handleRun(workEntry) {
             }
         };
 
-        const runHandler = createRunHandler(jobId, runId);
+        const runManager = createRunManager(jobId, runId);
 
         handler.run(
             runConfig,
-            runHandler.onRunEvent,
-            runHandler.onRunSuccess,
-            runHandler.onRunFail
+            runManager.onRunEvent,
+            runManager.onRunSuccess,
+            runManager.onRunFail
         );
 
     } catch (err) {
