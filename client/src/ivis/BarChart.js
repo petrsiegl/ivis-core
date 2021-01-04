@@ -165,11 +165,11 @@ export class StaticBarChart extends Component {
         this.xAxisSelection.call(xAxis);
 
 
-        // Ellipsis on too long labels
+        // Checking overflowing labels
         const texts = this.xAxisSelection.selectAll('.tick text');
-        texts.nodes().forEach(e => {
+        texts.nodes().forEach((e, i) => {
             if (e.getBBox().width > xScale.bandwidth()) {
-                e.textContent = this.props.labelFormatOnBarWidthOverflow(e.textContent);
+                e.textContent = this.props.labelFormatOnBarWidthOverflow(e.textContent, i);
             }
         });
 
